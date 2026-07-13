@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenSeek Knowledge Graph — Live from Your MD Files</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #070a08;
+            color: #e0e8e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container { max-width: 1300px; width: 100%; }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 20px;
+            border-bottom: 1px solid #1a2a1f;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #e8f0e8;
+        }
+        .logo span { color: #2a8b5a; }
+        .logo .badge {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 20px;
+            padding: 2px 14px;
+            color: #5a8a6a;
+            margin-left: 8px;
+        }
+        .meta {
+            font-size: 13px;
+            color: #5a6a5a;
+        }
+        .meta .highlight { color: #2a8b5a; font-weight: 600; }
+
+        /* Status */
+        .status-bar {
+            display: flex;
+            gap: 24px;
+            padding: 14px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #1a2a1f;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #7a8a7a;
+        }
+        .status-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2a8b5a;
+        }
+        .status-item strong { color: #e8f0e8; font-weight: 500; }
+
+        /* File Upload Section */
+        .upload-section {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .upload-section .label {
+            font-size: 13px;
+            color: #6a7a6a;
+            margin-bottom: 8px;
+        }
+        .upload-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .upload-row input[type="file"] {
+            flex: 1;
+            min-width: 200px;
+            background: #070a08;
+            border: 1px solid #1a2a1f;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #c8d8c8;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+        }
+        .upload-row input[type="file"]::file-selector-button {
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 6px;
+            padding: 6px 16px;
+            color: #e8f0e8;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: all 0.3s;
+        }
+        .upload-row input[type="file"]::file-selector-button:hover {
+            background: #2a4a3a;
+            border-color: #2a8b5a;
+        }
+        .upload-row button {
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e8f0e8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .upload-row button:hover {
+            background: #2a4a3a;
+            border-color: #2a8b5a;
+        }
+        .upload-row .file-count {
+            font-size: 13px;
+            color: #5a6a5a;
+        }
+
+        /* Graph */
+        .graph-section { padding: 20px 0; }
+        .graph-container {
+            background: #0a0f0a;
+            border: 1px solid #1a2a1f;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        .graph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .graph-header h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e8f0e8;
+        }
+        .graph-header .hint {
+            font-size: 12px;
+            color: #4a5a4a;
+        }
+        .graph-header .controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .graph-header .controls button {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 6px;
+            color: #7a8a7a;
+            padding: 4px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+        .graph-header .controls button:hover {
+            border-color: #2a4a3a;
+            color: #e8f0e8;
+        }
+
+        .graph-wrapper {
+            width: 100%;
+            height: 520px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #070a08;
+            cursor: grab;
+            position: relative;
+            border: 1px solid #0d150f;
+        }
+        .graph-wrapper:active { cursor: grabbing; }
+        .graph-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #0d120f;
+            border: 1px solid #2a4a3a;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #e8f0e8;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 260px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 10;
+        }
+        .tooltip.visible { opacity: 1; }
+        .tooltip .tl { font-weight: 600; color: #2a8b5a; }
+        .tooltip .td { color: #8a9a8a; font-size: 12px; margin-top: 2px; }
+        .tooltip .rel {
+            font-size: 11px;
+            color: #4a6a5a;
+            margin-top: 4px;
+            border-top: 1px solid #1a2a1f;
+            padding-top: 4px;
+        }
+        .tooltip .path {
+            font-size: 10px;
+            color: #3a5a4a;
+            margin-top: 3px;
+            font-family: monospace;
+        }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #1a2a1f;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #7a8a7a;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legend-dot.product { background: #2a6b4a; }
+        .legend-dot.brand { background: #6a8b5a; }
+        .legend-dot.faq { background: #4a7a6a; }
+        .legend-dot.glossary { background: #2a8b5a; }
+        .legend-dot.concept { background: #5a8a6a; }
+        .legend-dot.edge { background: #2a4a3a; width: 18px; height: 2px; border-radius: 0; }
+
+        /* File list */
+        .file-list {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .file-tag {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 16px;
+            padding: 4px 14px;
+            font-size: 11px;
+            color: #7a8a7a;
+            font-family: monospace;
+        }
+        .file-tag .type {
+            color: #2a8b5a;
+            font-weight: 600;
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .info-card {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+        .info-card .num {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2a8b5a;
+        }
+        .info-card .lbl {
+            font-size: 11px;
+            color: #5a6a5a;
+            margin-top: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px 0 10px;
+            border-top: 1px solid #1a2a1f;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: #4a5a4a;
+        }
+        .footer a { color: #5a7a5a; text-decoration: none; }
+        .footer a:hover { color: #8aaa8a; }
+
+        @media (max-width: 768px) {
+            .info-panel { grid-template-columns: 1fr 1fr; }
+            .graph-wrapper { height: 340px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .upload-row { flex-direction: column; }
+            .upload-row input[type="file"] { min-width: auto; width: 100%; }
+            .upload-row button { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">
+            GreenSeek <span>AI</span>
+            <span class="badge">Live Knowledge Graph</span>
+        </div>
+        <div class="meta">
+            For <span class="highlight">Emilio</span> · By <span class="highlight">Viva</span> · July 2026
+        </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-bar">
+        <div class="status-item"><div class="dot"></div> <strong id="docCount">0</strong> MD Files Loaded</div>
+        <div class="status-item"><div class="dot"></div> <strong id="nodeCount">0</strong> Graph Nodes</div>
+        <div class="status-item"><div class="dot"></div> <strong id="edgeCount">0</strong> Connections</div>
+        <div class="status-item"><div class="dot"></div> <span id="statusText">Waiting for files...</span></div>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="upload-section">
+        <div class="label">📁 Upload your markdown files — they stay in your browser, nothing is sent anywhere</div>
+        <div class="upload-row">
+            <input type="file" id="fileInput" multiple accept=".md,.markdown" webkitdirectory />
+            <button onclick="processFiles()">Build Knowledge Graph</button>
+            <button onclick="clearAll()" style="background:#1a1a1a;border-color:#2a2a2a;">Clear</button>
+            <span class="file-count" id="fileCount">0 files selected</span>
+        </div>
+        <div class="file-list" id="fileList"></div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="graph-section">
+        <div class="graph-container">
+            <div class="graph-header">
+                <h2>Knowledge Graph — From Your MD Files</h2>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span class="hint">Drag to pan · Scroll to zoom</span>
+                    <div class="controls">
+                        <button onclick="resetGraph()">Reset View</button>
+                        <button onclick="autoLayout()">Auto Layout</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="graph-wrapper" id="graphWrapper">
+                <svg id="graphSvg" viewBox="0 0 1000 600">
+                    <!-- Dynamic content goes here -->
+                </svg>
+                <div class="tooltip" id="tooltip">
+                    <div class="tl" id="tipLabel">Node</div>
+                    <div class="td" id="tipDesc">Description</div>
+                    <div class="rel" id="tipRel">Connections</div>
+                    <div class="path" id="tipPath">Path</div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <span class="legend-item"><span class="legend-dot product"></span> Product</span>
+                <span class="legend-item"><span class="legend-dot brand"></span> Brand</span>
+                <span class="legend-item"><span class="legend-dot faq"></span> FAQ</span>
+                <span class="legend-item"><span class="legend-dot glossary"></span> Glossary</span>
+                <span class="legend-item"><span class="legend-dot concept"></span> Concept</span>
+                <span class="legend-item"><span class="legend-dot edge"></span> Relationship</span>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="info-panel">
+            <div class="info-card">
+                <div class="num" id="infoDocs">0</div>
+                <div class="lbl">Documents Loaded</div>
+            </div>
+            <div class="info-card">
+                <div class="num" id="infoNodes">0</div>
+                <div class="lbl">Graph Nodes</div>
+            </div>
+            <div class="info-card">
+                <div class="num" id="infoEdges">0</div>
+                <div class="lbl">Connections</div>
+            </div>
+            <div class="info-card">
+                <div class="num" id="infoTypes">0</div>
+                <div class="lbl">File Types</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div>
+            <span style="color:#2a8b5a;">●</span> GreenSeek AI Marketing OS · Built by Viva Lancsweert
+        </div>
+        <div>
+            <a href="mailto:vivalancsweert@gmail.com">vivalancsweert@gmail.com</a>
+            <span style="margin:0 12px;color:#2a3a2a;">|</span>
+            <span>Your files stay in your browser</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ─── STATE ───
+let allFiles = [];
+let graphData = { nodes: [], edges: [] };
+
+// ─── FILE HANDLING ───
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const fileList = document.getElementById('fileList');
+    const fileCount = document.getElementById('fileCount');
+
+    allFiles = Array.from(files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.markdown'));
+    fileCount.textContent = allFiles.length + ' files selected';
+
+    // Show file names
+    fileList.innerHTML = '';
+    allFiles.forEach(f => {
+        const tag = document.createElement('span');
+        tag.className = 'file-tag';
+        const folder = f.webkitRelativePath ? f.webkitRelativePath.split('/').slice(0, -1).join('/') : '';
+        const type = folder || 'root';
+        tag.innerHTML = `<span class="type">${type}</span>/${f.name}`;
+        fileList.appendChild(tag);
+    });
+
+    // Auto-process if files selected
+    if (allFiles.length > 0) {
+        processFiles();
+    }
+});
+
+// ─── PROCESS FILES ───
+async function processFiles() {
+    if (allFiles.length === 0) {
+        alert('Please select some .md files first.');
+        return;
+    }
+
+    document.getElementById('statusText').textContent = 'Processing files...';
+    document.getElementById('statusText').style.color = '#8a8a2a';
+
+    const contents = [];
+    for (const file of allFiles) {
+        const text = await file.text();
+        const path = file.webkitRelativePath || file.name;
+        contents.push({
+            name: file.name,
+            path: path,
+            content: text,
+            folder: path.split('/').slice(0, -1).join('/') || 'root'
+        });
+    }
+
+    buildGraph(contents);
+}
+
+// ─── BUILD GRAPH ───
+function buildGraph(files) {
+    const nodes = [];
+    const edges = [];
+    const nodeMap = {};
+
+    // Helper: detect type from path
+    function getType(path) {
+        const p = path.toLowerCase();
+        if (p.includes('/product/') || p.includes('product')) return 'product';
+        if (p.includes('/brand/') || p.includes('brand')) return 'brand';
+        if (p.includes('/faq/') || p.includes('faq')) return 'faq';
+        if (p.includes('/glossary/') || p.includes('glossary')) return 'glossary';
+        return 'concept';
+    }
+
+    // Helper: extract title from markdown
+    function getTitle(content, filename) {
+        const match = content.match(/^#\s+(.+)$/m);
+        if (match) return match[1].trim();
+        // Try alternative heading
+        const match2 = content.match(/^##\s+(.+)$/m);
+        if (match2) return match2[1].trim();
+        return filename.replace(/\.md$/, '').replace(/-/g, ' ');
+    }
+
+    // Helper: extract keywords from content
+    function getKeywords(content) {
+        const words = content.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+        const stopWords = new Set(['the','and','for','with','this','that','from','have','are','was','were','can','all','not','but','his','her','our','your','you','we','they','them','their']);
+        const freq = {};
+        for (const w of words) {
+            if (w.length > 2 && !stopWords.has(w)) {
+                freq[w] = (freq[w] || 0) + 1;
+            }
+        }
+        const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]);
+        return sorted.slice(0, 5).map(([w]) => w);
+    }
+
+    // Helper: extract summary
+    function getSummary(content) {
+        const lines = content.split('\n');
+        let summary = '';
+        for (const line of lines) {
+            if (line.trim() && !line.startsWith('#') && !line.startsWith('---') && !line.startsWith('|')) {
+                summary = line.trim().slice(0, 150);
+                if (summary.length > 0) break;
+            }
+        }
+        return summary || 'No summary available';
+    }
+
+    // Create nodes from files
+    for (const file of files) {
+        const id = file.name.replace(/\.md$/, '');
+        const type = getType(file.path);
+        const title = getTitle(file.content, file.name);
+        const summary = getSummary(file.content);
+        const keywords = getKeywords(file.content);
+
+        nodes.push({
+            id: id,
+            label: title,
+            type: type,
+            summary: summary,
+            path: file.path,
+            keywords: keywords,
+            folder: file.folder
+        });
+        nodeMap[id] = true;
+    }
+
+    // Create edges based on shared keywords and folder structure
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i];
+            const b = nodes[j];
+            let weight = 0;
+
+            // Shared keywords
+            const shared = a.keywords.filter(k => b.keywords.includes(k));
+            weight += shared.length * 2;
+
+            // Same folder
+            if (a.folder === b.folder && a.folder !== 'root') {
+                weight += 3;
+            }
+
+            // Title overlap
+            const aWords = a.label.toLowerCase().split(' ');
+            const bWords = b.label.toLowerCase().split(' ');
+            const overlap = aWords.filter(w => bWords.includes(w) && w.length > 2);
+            weight += overlap.length;
+
+            if (weight >= 2) {
+                edges.push({
+                    source: a.id,
+                    target: b.id,
+                    weight: Math.min(weight, 5),
+                    shared: shared.slice(0, 3)
+                });
+            }
+        }
+    }
+
+    // Also create edges to the main categories based on folder
+    const folderNodes = {};
+    for (const node of nodes) {
+        if (!folderNodes[node.folder] && node.folder !== 'root') {
+            folderNodes[node.folder] = {
+                id: 'folder-' + node.folder.replace(/\//g, '-'),
+                label: node.folder.split('/').pop().toUpperCase(),
+                type: 'folder',
+                summary: 'Folder: ' + node.folder,
+                path: node.folder,
+                keywords: [],
+                folder: node.folder,
+                isFolder: true
+            };
+        }
+    }
+
+    // Add folder nodes
+    for (const [key, fn] of Object.entries(folderNodes)) {
+        if (!nodeMap[fn.id]) {
+            nodes.push(fn);
+            nodeMap[fn.id] = true;
+        }
+    }
+
+    // Connect files to their folder nodes
+    for (const node of nodes) {
+        if (node.folder !== 'root' && !node.isFolder) {
+            const folderId = 'folder-' + node.folder.replace(/\//g, '-');
+            if (nodeMap[folderId]) {
+                edges.push({
+                    source: folderId,
+                    target: node.id,
+                    weight: 4,
+                    shared: ['contains']
+                });
+            }
+        }
+    }
+
+    graphData = { nodes, edges };
+    renderGraph();
+    updateStats();
+
+    document.getElementById('statusText').textContent = '✅ Graph built! ' + nodes.length + ' nodes, ' + edges.length + ' connections';
+    document.getElementById('statusText').style.color = '#2a8b5a';
+}
+
+// ─── RENDER GRAPH ───
+function renderGraph() {
+    const svg = document.getElementById('graphSvg');
+    const nodes = graphData.nodes;
+    const edges = graphData.edges;
+
+    if (nodes.length === 0) {
+        svg.innerHTML = `<text x="500" y="300" text-anchor="middle" fill="#4a5a4a" font-size="18">No data — upload markdown files above</text>`;
+        return;
+    }
+
+    // Position nodes using force-directed layout (simple)
+    const width = 950;
+    const height = 550;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Assign positions
+    const positions = {};
+    const nodeList = nodes.filter(n => !n.isFolder);
+    const folderNodes = nodes.filter(n => n.isFolder);
+
+    // Place folder nodes at top
+    const folderCount = folderNodes.length;
+    folderNodes.forEach((n, i) => {
+        const angle = (i / folderCount) * Math.PI * 2 - Math.PI / 2;
+        const radius = 120;
+        positions[n.id] = {
+            x: centerX + Math.cos(angle) * radius,
+            y: 80 + Math.sin(angle) * radius * 0.6
+        };
+    });
+
+    // Place content nodes in a circle
+    const contentCount = nodeList.length;
+    const radius = Math.min(300, 150 + contentCount * 2);
+    nodeList.forEach((n, i) => {
+        const angle = (i / contentCount) * Math.PI * 2 - Math.PI / 2;
+        // Slight random offset for better distribution
+        const offset = (Math.random() - 0.5) * 40;
+        positions[n.id] = {
+            x: centerX + Math.cos(angle) * (radius + offset),
+            y: centerY + Math.sin(angle) * (radius + offset) * 0.7
+        };
+    });
+
+    // Build SVG
+    let svgContent = '';
+
+    // Draw edges
+    const colorMap = {
+        'product': '#2a6b4a',
+        'brand': '#6a8b5a',
+        'faq': '#4a7a6a',
+        'glossary': '#2a8b5a',
+        'concept': '#5a8a6a',
+        'folder': '#8a7a4a'
+    };
+
+    const seenEdges = new Set();
+    for (const edge of edges) {
+        const key = [edge.source, edge.target].sort().join('-');
+        if (seenEdges.has(key)) continue;
+        seenEdges.add(key);
+
+        const source = positions[edge.source];
+        const target = positions[edge.target];
+        if (!source || !target) continue;
+
+        const weight = edge.weight || 1;
+        const opacity = 0.2 + (weight / 6) * 0.6;
+
+        svgContent += `<line class="edge" x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}" 
+            stroke="#1a3a2a" stroke-width="${1 + weight * 0.5}" opacity="${opacity}" 
+            data-source="${edge.source}" data-target="${edge.target}" />`;
+    }
+
+    // Draw nodes
+    for (const node of nodes) {
+        const pos = positions[node.id];
+        if (!pos) continue;
+
+        const type = node.type || 'concept';
+        const color = colorMap[type] || '#5a8a6a';
+        const isFolder = node.isFolder || false;
+
+        const r = isFolder ? 28 : (22 + Math.min(node.keywords ? node.keywords.length : 0, 2) * 3);
+        const label = node.label || node.id;
+        const shortLabel = label.length > 20 ? label.slice(0, 18) + '…' : label;
+
+        // Node circle
+        const strokeWidth = isFolder ? 2.5 : 2;
+        const dasharray = isFolder ? '4,4' : '';
+
+        svgContent += `<g class="node" data-id="${node.id}" data-label="${label}" data-desc="${node.summary || ''}" data-type="${type}" data-path="${node.path || ''}">`;
+        svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="${r}" fill="#0d150f" stroke="${color}" stroke-width="${strokeWidth}" stroke-dasharray="${dasharray}" />`;
+
+        // Label
+        const fontSize = isFolder ? 9 : (r > 26 ? 8 : 7);
+        svgContent += `<text x="${pos.x}" y="${pos.y - (r > 26 ? 3 : 0)}" font-size="${fontSize}" font-weight="${isFolder ? 700 : 500}" 
+            fill="${isFolder ? '#8a7a4a' : '#c8d8c8'}" text-anchor="middle" dominant-baseline="central">${shortLabel}</text>`;
+
+        // Type badge for small nodes
+        if (r > 26 && !isFolder) {
+            const typeLabel = type.charAt(0).toUpperCase();
+            svgContent += `<text x="${pos.x}" y="${pos.y + 14}" font-size="7" fill="#4a5a4a" text-anchor="middle" dominant-baseline="central">${typeLabel}</text>`;
+        }
+
+        svgContent += `</g>`;
+    }
+
+    svg.innerHTML = svgContent;
+
+    // Re-attach event listeners
+    attachGraphEvents();
+}
+
+// ─── GRAPH EVENTS ───
+function attachGraphEvents() {
+    const wrapper = document.getElementById('graphWrapper');
+    const tooltip = document.getElementById('tooltip');
+    const tipLabel = document.getElementById('tipLabel');
+    const tipDesc = document.getElementById('tipDesc');
+    const tipRel = document.getElementById('tipRel');
+    const tipPath = document.getElementById('tipPath');
+
+    const nodes = document.querySelectorAll('.node');
+    const edges = document.querySelectorAll('.edge');
+
+    nodes.forEach(node => {
+        node.addEventListener('mouseenter', function(e) {
+            const label = this.dataset.label || 'Node';
+            const desc = this.dataset.desc || 'No description';
+            const type = this.dataset.type || 'concept';
+            const path = this.dataset.path || '';
+
+            tipLabel.textContent = label + ' · ' + type.toUpperCase();
+            tipDesc.textContent = desc;
+
+            // Find connections
+            const connected = [];
+            const nodeId = this.dataset.id;
+            edges.forEach(edge => {
+                if (edge.dataset.source === nodeId) {
+                    const target = document.querySelector(`.node[data-id="${edge.dataset.target}"]`);
+                    if (target) connected.push(target.dataset.label);
+                }
+                if (edge.dataset.target === nodeId) {
+                    const source = document.querySelector(`.node[data-id="${edge.dataset.source}"]`);
+                    if (source) connected.push(source.dataset.label);
+                }
+            });
+
+            if (connected.length > 0) {
+                tipRel.textContent = 'Connected to: ' + connected.slice(0, 5).join(' · ');
+            } else {
+                tipRel.textContent = 'No direct connections';
+            }
+
+            tipPath.textContent = path || '';
+
+            tooltip.classList.add('visible');
+
+            // Position
+            const rect = this.querySelector('circle').getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+            let left = rect.left - wrapperRect.left + rect.width / 2 - 100;
+            let top = rect.top - wrapperRect.top - 60;
+            if (left < 10) left = 10;
+            if (left > wrapperRect.width - 220) left = wrapperRect.width - 220;
+            if (top < 10) top = 10;
+            if (top > wrapperRect.height - 80) top = wrapperRect.height - 80;
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+
+            // Highlight edges
+            edges.forEach(edge => {
+                if (edge.dataset.source === nodeId || edge.dataset.target === nodeId) {
+                    edge.style.opacity = '0.9';
+                    edge.style.stroke = '#2a8b5a';
+                }
+            });
+        });
+
+        node.addEventListener('mouseleave', function() {
+            tooltip.classList.remove('visible');
+            edges.forEach(edge => {
+                edge.style.opacity = '';
+                edge.style.stroke = '#1a3a2a';
+            });
+        });
+
+        node.addEventListener('click', function() {
+            const label = this.dataset.label || 'Node';
+            const desc = this.dataset.desc || 'No description';
+            const path = this.dataset.path || '';
+            alert('📄 ' + label + '\n\n' + desc + '\n\n📁 ' + path);
+        });
+    });
+
+    // Edge hover
+    edges.forEach(edge => {
+        edge.addEventListener('mouseenter', function() {
+            const source = document.querySelector(`.node[data-id="${this.dataset.source}"]`);
+            const target = document.querySelector(`.node[data-id="${this.dataset.target}"]`);
+            if (source) source.querySelector('circle').style.stroke = '#2a8b5a';
+            if (target) target.querySelector('circle').style.stroke = '#2a8b5a';
+            this.style.opacity = '0.9';
+            this.style.stroke = '#2a8b5a';
+        });
+        edge.addEventListener('mouseleave', function() {
+            const source = document.querySelector(`.node[data-id="${this.dataset.source}"]`);
+            const target = document.querySelector(`.node[data-id="${this.dataset.target}"]`);
+            if (source) source.querySelector('circle').style.stroke = '';
+            if (target) target.querySelector('circle').style.stroke = '';
+            this.style.opacity = '';
+            this.style.stroke = '#1a3a2a';
+        });
+    });
+}
+
+// ─── GRAPH CONTROLS ───
+let translateX = 0, translateY = 0, scale = 1;
+let isDragging = false, startX, startY;
+
+const wrapper = document.getElementById('graphWrapper');
+const svg = document.getElementById('graphSvg');
+
+wrapper.addEventListener('mousedown', function(e) {
+    if (e.target.closest('svg') || e.target.tagName === 'svg') {
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        wrapper.style.cursor = 'grabbing';
+    }
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    applyTransform();
+});
+
+document.addEventListener('mouseup', function() {
+    isDragging = false;
+    wrapper.style.cursor = 'grab';
+});
+
+wrapper.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    scale = Math.min(2.5, Math.max(0.5, scale + (e.deltaY > 0 ? -0.1 : 0.1)));
+    applyTransform();
+}, { passive: false });
+
+function applyTransform() {
+    svg.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+    svg.style.transformOrigin = 'center center';
+}
+
+function resetGraph() {
+    translateX = 0;
+    translateY = 0;
+    scale = 1;
+    applyTransform();
+}
+
+function autoLayout() {
+    resetGraph();
+    // Re-run layout with slight random shift
+    renderGraph();
+}
+
+// ─── UPDATE STATS ───
+function updateStats() {
+    const nodes = graphData.nodes || [];
+    const edges = graphData.edges || [];
+    const uniqueTypes = new Set(nodes.map(n => n.type));
+
+    document.getElementById('docCount').textContent = allFiles.length;
+    document.getElementById('nodeCount').textContent = nodes.length;
+    document.getElementById('edgeCount').textContent = edges.length;
+    document.getElementById('infoDocs').textContent = allFiles.length;
+    document.getElementById('infoNodes').textContent = nodes.length;
+    document.getElementById('infoEdges').textContent = edges.length;
+    document.getElementById('infoTypes').textContent = uniqueTypes.size;
+}
+
+function clearAll() {
+    allFiles = [];
+    graphData = { nodes: [], edges: [] };
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileCount').textContent = '0 files selected';
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('statusText').textContent = 'Waiting for files...';
+    document.getElementById('statusText').style.color = '#7a8a7a';
+    document.getElementById('graphSvg').innerHTML = `<text x="500" y="300" text-anchor="middle" fill="#4a5a4a" font-size="18">Upload markdown files to build the graph</text>`;
+    updateStats();
+    resetGraph();
+}
+
+// ─── INIT ───
+resetGraph();
+document.getElementById('graphSvg').innerHTML = `<text x="500" y="300" text-anchor="middle" fill="#4a5a4a" font-size="18">Upload markdown files to build the knowledge graph</text>`;
+updateStats();
+</script>
+
+</body>
+</html>

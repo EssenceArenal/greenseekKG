@@ -1,0 +1,422 @@
+[
+ {
+  "path": "knowledge-garden/brand/audience-profiles.md",
+  "area": "knowledge-garden",
+  "category": "brand",
+  "title": "Audience Profiles",
+  "summary": "Independent professionals, academics, consultants. Cares about credible sources, low footprint, and cost. Objection: \"is a values-led AI actually good?\" Answer with capability first (Research workflows, Ultra mode), values second.",
+  "keywords": [
+   "cares",
+   "about",
+   "values",
+   "plus",
+   "research",
+   "workflows",
+   "team",
+   "data"
+  ],
+  "status": "",
+  "words": 135,
+  "modified": 1783960042.8965516
+ },
+ {
+  "path": "knowledge-garden/brand/messaging-pillars.md",
+  "area": "knowledge-garden",
+  "category": "brand",
+  "title": "Messaging Pillars",
+  "summary": "1. **Private by design** \u2014 redaction modes, dual-layer encryption, incognito mode, project isolation, sovereign AI. Proof points: \"locked behind your own access code \u2014 inaccessible to anyone, includin",
+  "keywords": [
+   "greenseek",
+   "efficient",
+   "models",
+   "story",
+   "regenerative",
+   "tools",
+   "repair",
+   "messaging"
+  ],
+  "status": "",
+  "words": 135,
+  "modified": 1783960042.9033852
+ },
+ {
+  "path": "knowledge-garden/brand/voice.md",
+  "area": "knowledge-garden",
+  "category": "brand",
+  "title": "GreenSeek Voice",
+  "summary": "Calm confidence, grounded optimism, zero greenwash.",
+  "keywords": [
+   "greenseek",
+   "one",
+   "grounded",
+   "renewable",
+   "planet",
+   "privacy",
+   "regenerative",
+   "repair"
+  ],
+  "status": "",
+  "words": 166,
+  "modified": 1783960042.9106016
+ },
+ {
+  "path": "knowledge-garden/faq/billing-and-plans.md",
+  "area": "knowledge-garden",
+  "category": "faq",
+  "title": "FAQ \u2014 Billing & Plans",
+  "summary": "- **What plans are available?** Starter ($15/mo), Plus ($50/mo, most popular), Pro Compute ($150/mo), Enterprise (custom). See product/pricing-plans.md. - **How do free trials work?** 7-day free trial",
+  "keywords": [
+   "plans",
+   "what",
+   "verify",
+   "see",
+   "free",
+   "trial",
+   "limit",
+   "check"
+  ],
+  "status": "",
+  "words": 98,
+  "modified": 1783960043.0182216
+ },
+ {
+  "path": "knowledge-garden/faq/privacy-and-security.md",
+  "area": "knowledge-garden",
+  "category": "faq",
+  "title": "FAQ \u2014 Privacy & Security",
+  "summary": "- **Does GreenSeek use my data to train AI models?** Incognito mode guarantees nothing from the session is retained or used to improve models. For standard modes: [VERIFY exact policy wording before p",
+  "keywords": [
+   "data",
+   "what",
+   "encryption",
+   "redaction",
+   "privacy",
+   "greenseek",
+   "models",
+   "modes"
+  ],
+  "status": "",
+  "words": 127,
+  "modified": 1783960043.024725
+ },
+ {
+  "path": "knowledge-garden/faq/sustainability-and-impact.md",
+  "area": "knowledge-garden",
+  "category": "faq",
+  "title": "FAQ \u2014 Sustainability & Impact",
+  "summary": "- **How is GreenSeek powered by renewable energy?** Renewable-backed infrastructure: cleaner regions, sustainable partners, energy-aware deployment as a default. - **What is adaptive model routing?** ",
+  "keywords": [
+   "impact",
+   "energy",
+   "greenseek",
+   "renewable",
+   "what",
+   "model",
+   "models",
+   "pledge"
+  ],
+  "status": "",
+  "words": 87,
+  "modified": 1783960043.0309749
+ },
+ {
+  "path": "knowledge-garden/glossary/adaptive-model-routing.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Adaptive Model Routing",
+  "summary": "> **Definition:** Adaptive model routing automatically selects the right-sized AI model for each task: small, efficient models handle everyday work, while deeper models activate only when a task needs them. GreenSeek uses adaptive routing to cut energy use and cost without sacrificing quality on har",
+  "keywords": [
+   "routing",
+   "adaptive",
+   "model",
+   "models",
+   "type",
+   "task",
+   "greenseek",
+   "energy"
+  ],
+  "status": "",
+  "words": 372,
+  "modified": 1783970976.045284
+ },
+ {
+  "path": "knowledge-garden/glossary/augmented-biological-intelligence.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Augmented Biological Intelligence",
+  "summary": "> **Definition:** Augmented Biological Intelligence (ABI) is GreenSeek's framework for AI that serves living minds and ecosystems rather than replacing them: compute, models, and capital directed toward flourishing \u2014 cleaner infrastructure, efficient inference, and repair for the planet.",
+  "keywords": [
+   "intelligence",
+   "abi",
+   "type",
+   "augmented",
+   "biological",
+   "greenseek",
+   "framework",
+   "repair"
+  ],
+  "status": "",
+  "words": 285,
+  "modified": 1783970976.0498085
+ },
+ {
+  "path": "knowledge-garden/glossary/dual-layer-encryption.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Dual-Layer Encryption",
+  "summary": "> **Definition:** Dual-layer encryption lets a GreenSeek user set a personal encryption password on any project or chat thread. Once enabled, the content is locked behind the user's own access code and is inaccessible to anyone \u2014 including GreenSeek itself.",
+  "keywords": [
+   "encryption",
+   "dual",
+   "layer",
+   "type",
+   "greenseek",
+   "privacy",
+   "password",
+   "content"
+  ],
+  "status": "",
+  "words": 310,
+  "modified": 1783970976.0617924
+ },
+ {
+  "path": "knowledge-garden/glossary/eco-mode.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Eco Mode",
+  "summary": "> **Definition:** Eco Mode is GreenSeek's most energy-efficient response mode, routing everyday questions to compact, renewable-powered models. Alongside Standard, Deep, and Ultra modes, it lets users match compute intensity to task difficulty.",
+  "keywords": [
+   "eco",
+   "mode",
+   "type",
+   "ultra",
+   "everyday",
+   "modes",
+   "efficient",
+   "models"
+  ],
+  "status": "",
+  "words": 335,
+  "modified": 1783970976.0572166
+ },
+ {
+  "path": "knowledge-garden/glossary/generative-engine-optimization.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Generative Engine Optimization",
+  "summary": "> **Definition:** Generative Engine Optimization (GEO) is the practice of structuring content so AI assistants \u2014 ChatGPT, Perplexity, Google AI Overviews \u2014 cite it as a source. Definition-first pages, FAQ schema, and precise, verifiable claims are its core techniques.",
+  "keywords": [
+   "geo",
+   "type",
+   "generative",
+   "engine",
+   "optimization",
+   "definition",
+   "schema",
+   "seo"
+  ],
+  "status": "",
+  "words": 212,
+  "modified": 1783970976.0706828
+ },
+ {
+  "path": "knowledge-garden/glossary/incognito-mode.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Incognito Mode",
+  "summary": "> **Definition:** Incognito mode in GreenSeek disables session history, prevents logging, and ensures nothing from the session is retained or used to improve models \u2014 research and query without leaving a trace.",
+  "keywords": [
+   "incognito",
+   "mode",
+   "type",
+   "greenseek",
+   "encryption",
+   "session",
+   "prevents",
+   "models"
+  ],
+  "status": "",
+  "words": 282,
+  "modified": 1783970976.0663345
+ },
+ {
+  "path": "knowledge-garden/glossary/sovereign-ai.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "Sovereign AI",
+  "summary": "> **Definition:** Sovereign AI means the user \u2014 not the platform \u2014 controls the data, encryption keys, and privacy rules of their AI experience. In GreenSeek, sovereignty is delivered through dual-layer encryption (content locked behind the user's own access code, inaccessible to anyone including Gr",
+  "keywords": [
+   "sovereign",
+   "encryption",
+   "type",
+   "greenseek",
+   "data",
+   "private",
+   "features",
+   "dual"
+  ],
+  "status": "",
+  "words": 412,
+  "modified": 1783970976.0381107
+ },
+ {
+  "path": "knowledge-garden/glossary/the-20-impact-pledge.md",
+  "area": "knowledge-garden",
+  "category": "glossary",
+  "title": "The 20% Impact Pledge",
+  "summary": "> **Definition:** The 20% impact pledge is GreenSeek's public commitment, tied to the GreenSeek Foundation, directing a portion of profits to regenerative and earth-repair projects \u2014 restoring land, protecting ecosystems, and funding aligned environmental work. [VERIFY exact pledge terms before publ",
+  "keywords": [
+   "impact",
+   "pledge",
+   "type",
+   "greenseek",
+   "sustainability",
+   "foundation",
+   "knowledge",
+   "definition"
+  ],
+  "status": "",
+  "words": 238,
+  "modified": 1783970976.078456
+ },
+ {
+  "path": "knowledge-garden/product/ecocomputer.md",
+  "area": "knowledge-garden",
+  "category": "product",
+  "title": "EcoComputer & Platform Features",
+  "summary": "EcoComputer is GreenSeek's workspace concept: Research, Create, and Automate in one place. Supporting features from the product knowledge base:",
+  "keywords": [
+   "knowledge",
+   "file",
+   "chat",
+   "mode",
+   "tasks",
+   "ecocomputer",
+   "features",
+   "research"
+  ],
+  "status": "",
+  "words": 221,
+  "modified": 1783960042.9911146
+ },
+ {
+  "path": "knowledge-garden/product/overview.md",
+  "area": "knowledge-garden",
+  "category": "product",
+  "title": "GreenSeek Overview",
+  "summary": "GreenSeek is an AI workspace designed for the regenerative future \u2014 built for privacy and powered by renewable energy. Its tagline: \"Research smarter. Discover cleaner.\" One workspace to research markets, create deliverables, and run autonomous workflows.",
+  "keywords": [
+   "greenseek",
+   "renewable",
+   "research",
+   "intelligence",
+   "regenerative",
+   "powered",
+   "energy",
+   "workflows"
+  ],
+  "status": "",
+  "words": 207,
+  "modified": 1783960043.004858
+ },
+ {
+  "path": "knowledge-garden/product/pricing-plans.md",
+  "area": "knowledge-garden",
+  "category": "product",
+  "title": "Pricing & Plans",
+  "summary": "All paid plans start with a 7-day free trial; no charge until the trial ends.",
+  "keywords": [
+   "support",
+   "000",
+   "month",
+   "monthly",
+   "credits",
+   "projects",
+   "storage",
+   "custom"
+  ],
+  "status": "",
+  "words": 167,
+  "modified": 1783960042.9977875
+ },
+ {
+  "path": "knowledge-garden/product/privacy-features.md",
+  "area": "knowledge-garden",
+  "category": "product",
+  "title": "Privacy Features \u2014 Private by Design",
+  "summary": "GreenSeek's position: ethical intelligence includes protecting your data, with tools for sovereign AI experiences. Encryption modes, name redaction, project isolation, and guaranteed data privacy.",
+  "keywords": [
+   "data",
+   "encryption",
+   "privacy",
+   "redaction",
+   "modes",
+   "sovereign",
+   "name",
+   "project"
+  ],
+  "status": "",
+  "words": 157,
+  "modified": 1783960042.9801433
+ },
+ {
+  "path": "content-studio/social/linkedin-audience-profiles.md",
+  "area": "content-studio",
+  "category": "social",
+  "title": "Linkedin \u2014 Audience Profiles",
+  "summary": "_Generated 2026-07-13 13:29 \u00b7 mode: template (set ANTHROPIC_API_KEY for Claude drafts) \u00b7 source: knowledge-garden/brand/audience-profiles.md \u00b7 status: draft_",
+  "keywords": [
+   "audience",
+   "profiles",
+   "mode",
+   "values",
+   "linkedin",
+   "generated",
+   "2026",
+   "template"
+  ],
+  "status": "",
+  "words": 76,
+  "modified": 1783970990.4702444
+ },
+ {
+  "path": "content-studio/social/linkedin-privacy-features.md",
+  "area": "content-studio",
+  "category": "social",
+  "title": "Linkedin \u2014 Privacy Features \u2014 Private by Design",
+  "summary": "_Generated 2026-07-13 16:17 \u00b7 mode: template (set ANTHROPIC_API_KEY for Claude drafts) \u00b7 source: knowledge-garden/product/privacy-features.md \u00b7 status: draft_",
+  "keywords": [
+   "privacy",
+   "features",
+   "private",
+   "design",
+   "data",
+   "linkedin",
+   "generated",
+   "2026"
+  ],
+  "status": "",
+  "words": 79,
+  "modified": 1783960042.6934292
+ },
+ {
+  "path": "analytics/insights/2026-07-insights.md",
+  "area": "analytics/insights",
+  "category": "insights",
+  "title": "Marketing Insights \u2014 2026-07",
+  "summary": "_Generated 2026-07-13 10:33 by analytics_report.py from analytics/data/_",
+  "keywords": [
+   "sessions",
+   "conversion",
+   "social",
+   "ctr",
+   "signups",
+   "hipaa",
+   "compliant",
+   "redaction"
+  ],
+  "status": "",
+  "words": 181,
+  "modified": 1783960422.0358312
+ }
+]
