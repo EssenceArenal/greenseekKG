@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenSeek Knowledge Graph — Dynamic Viewer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #070a08;
+            color: #e0e8e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; width: 100%; }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 20px;
+            border-bottom: 1px solid #1a2a1f;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #e8f0e8;
+        }
+        .logo span { color: #2a8b5a; }
+        .logo .badge {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 20px;
+            padding: 2px 14px;
+            color: #5a8a6a;
+            margin-left: 8px;
+        }
+        .meta {
+            font-size: 13px;
+            color: #5a6a5a;
+        }
+        .meta .highlight { color: #2a8b5a; font-weight: 600; }
+
+        /* Upload Bar */
+        .upload-bar {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 16px 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .upload-bar .label {
+            font-size: 13px;
+            color: #6a7a6a;
+        }
+        .upload-bar .label strong { color: #e8f0e8; }
+        .upload-bar .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .upload-bar input[type="file"] {
+            background: #070a08;
+            border: 1px solid #1a2a1f;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #c8d8c8;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            max-width: 280px;
+        }
+        .upload-bar input[type="file"]::file-selector-button {
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 6px;
+            padding: 6px 14px;
+            color: #e8f0e8;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        .upload-bar input[type="file"]::file-selector-button:hover {
+            background: #2a4a3a;
+            border-color: #2a8b5a;
+        }
+        .upload-bar button {
+            background: #1a2a1f;
+            border: 1px solid #2a4a3a;
+            border-radius: 8px;
+            padding: 9px 22px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e8f0e8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .upload-bar button:hover {
+            background: #2a4a3a;
+            border-color: #2a8b5a;
+        }
+        .upload-bar button.secondary {
+            background: transparent;
+            border-color: #1a2a1f;
+        }
+        .upload-bar button.secondary:hover {
+            border-color: #2a4a3a;
+        }
+        .file-count {
+            font-size: 13px;
+            color: #5a6a5a;
+        }
+        .file-count .num { color: #2a8b5a; font-weight: 600; }
+
+        /* Status */
+        .status-row {
+            display: flex;
+            gap: 24px;
+            padding: 12px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #1a2a1f;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #7a8a7a;
+        }
+        .status-item .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2a8b5a;
+        }
+        .status-item .dot.pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .status-item strong { color: #e8f0e8; font-weight: 500; }
+
+        /* Graph Container */
+        .graph-wrapper {
+            width: 100%;
+            height: 560px;
+            background: #0a0f0a;
+            border: 1px solid #1a2a1f;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+            margin-top: 16px;
+        }
+        .graph-wrapper:active { cursor: grabbing; }
+        .graph-wrapper svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Controls overlay */
+        .graph-controls {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+        .graph-controls button {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 8px;
+            color: #7a8a7a;
+            padding: 6px 14px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(8px);
+        }
+        .graph-controls button:hover {
+            border-color: #2a4a3a;
+            color: #e8f0e8;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: #0d120f;
+            border: 1px solid #2a4a3a;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #e8f0e8;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            max-width: 280px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+        .tooltip.visible { opacity: 1; }
+        .tooltip .tl { font-weight: 700; color: #2a8b5a; font-size: 14px; }
+        .tooltip .td { color: #8a9a8a; font-size: 12px; margin-top: 4px; line-height: 1.5; }
+        .tooltip .rel {
+            font-size: 11px;
+            color: #4a6a5a;
+            margin-top: 6px;
+            border-top: 1px solid #1a2a1f;
+            padding-top: 6px;
+        }
+        .tooltip .path {
+            font-size: 10px;
+            color: #3a5a4a;
+            margin-top: 4px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .tooltip .type-badge {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 1px 10px;
+            border-radius: 12px;
+            margin-top: 4px;
+        }
+        .tooltip .type-badge.product { background: #1a3a2a; color: #2a8b5a; }
+        .tooltip .type-badge.brand { background: #2a3a1a; color: #6a8b5a; }
+        .tooltip .type-badge.faq { background: #1a2a3a; color: #4a7a6a; }
+        .tooltip .type-badge.glossary { background: #1a3a2a; color: #2a8b5a; }
+        .tooltip .type-badge.concept { background: #1a2a2a; color: #5a8a6a; }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 14px 0 4px;
+            border-top: 1px solid #1a2a1f;
+            margin-top: 4px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #7a8a7a;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .legend-dot.product { background: #2a6b4a; }
+        .legend-dot.brand { background: #6a8b5a; }
+        .legend-dot.faq { background: #4a7a6a; }
+        .legend-dot.glossary { background: #2a8b5a; }
+        .legend-dot.concept { background: #5a8a6a; }
+        .legend-dot.edge { background: #2a4a3a; width: 18px; height: 2px; border-radius: 0; }
+
+        /* Stats panel */
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .stat-card {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        .stat-card:hover { border-color: #2a4a3a; }
+        .stat-card .num {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2a8b5a;
+            letter-spacing: -0.5px;
+        }
+        .stat-card .lbl {
+            font-size: 11px;
+            color: #5a6a5a;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* File list */
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 10px 0;
+        }
+        .file-tag {
+            background: #0d150f;
+            border: 1px solid #1a2a1f;
+            border-radius: 14px;
+            padding: 3px 12px;
+            font-size: 10px;
+            color: #7a8a7a;
+            font-family: monospace;
+            transition: all 0.3s;
+        }
+        .file-tag:hover {
+            border-color: #2a4a3a;
+            color: #e8f0e8;
+        }
+        .file-tag .type-label {
+            color: #2a8b5a;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 24px 0 10px;
+            border-top: 1px solid #1a2a1f;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: #4a5a4a;
+        }
+        .footer a { color: #5a7a5a; text-decoration: none; }
+        .footer a:hover { color: #8aaa8a; }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 10, 8, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 20;
+            backdrop-filter: blur(4px);
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1a2a1f;
+            border-top: 3px solid #2a8b5a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay .text {
+            font-size: 14px;
+            color: #7a8a7a;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-panel { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-panel { grid-template-columns: 1fr 1fr; }
+            .graph-wrapper { height: 380px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .upload-bar { flex-direction: column; align-items: stretch; }
+            .upload-bar .actions { flex-direction: column; }
+            .upload-bar input[type="file"] { max-width: 100%; }
+            .tooltip { max-width: 200px; font-size: 12px; }
+        }
+        @media (max-width: 480px) {
+            .stats-panel { grid-template-columns: 1fr; }
+            .status-row { flex-direction: column; gap: 8px; }
+            .graph-wrapper { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">
+            GreenSeek <span>AI</span>
+            <span class="badge">Knowledge Graph</span>
+        </div>
+        <div class="meta">
+            For <span class="highlight">Emilio</span> · By <span class="highlight">Viva</span> · July 2026
+        </div>
+    </div>
+
+    <!-- UPLOAD BAR -->
+    <div class="upload-bar">
+        <div class="label">
+            <strong>📁 Upload your knowledge-garden/</strong> · Files stay in your browser
+        </div>
+        <div class="actions">
+            <input type="file" id="fileInput" multiple accept=".md,.markdown" webkitdirectory />
+            <button onclick="processFiles()">Build Graph</button>
+            <button class="secondary" onclick="clearAll()">Clear</button>
+            <span class="file-count"><span class="num" id="fileCount">0</span> files</span>
+        </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-row">
+        <div class="status-item"><div class="dot" id="statusDot"></div> <span id="statusText">Ready — upload your files</span></div>
+        <div class="status-item"><strong id="docCount">0</strong> Documents</div>
+        <div class="status-item"><strong id="nodeCount">0</strong> Nodes</div>
+        <div class="status-item"><strong id="edgeCount">0</strong> Connections</div>
+        <div class="status-item" style="margin-left:auto;color:#4a5a4a;font-size:12px;" id="fileListInfo">No files loaded</div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="graph-wrapper" id="graphWrapper">
+        <svg id="graphSvg" viewBox="0 0 1100 640">
+            <text x="550" y="320" text-anchor="middle" fill="#4a5a4a" font-size="20" font-weight="300">
+                Upload your markdown files to build the knowledge graph
+            </text>
+            <text x="550" y="345" text-anchor="middle" fill="#3a4a3a" font-size="13">
+                Files are processed locally — nothing is sent anywhere
+            </text>
+        </svg>
+
+        <div class="tooltip" id="tooltip">
+            <div class="tl" id="tipLabel">Node</div>
+            <div class="type-badge" id="tipType">concept</div>
+            <div class="td" id="tipDesc">Description</div>
+            <div class="rel" id="tipRel">Connections</div>
+            <div class="path" id="tipPath">Path</div>
+        </div>
+
+        <div class="graph-controls">
+            <button onclick="resetGraph()">Reset View</button>
+            <button onclick="autoLayout()">Auto Layout</button>
+            <button onclick="toggleLabels()">Labels</button>
+        </div>
+
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="spinner"></div>
+            <div class="text">Building knowledge graph...</div>
+        </div>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="legend">
+        <span class="legend-item"><span class="legend-dot product"></span> Product</span>
+        <span class="legend-item"><span class="legend-dot brand"></span> Brand</span>
+        <span class="legend-item"><span class="legend-dot faq"></span> FAQ</span>
+        <span class="legend-item"><span class="legend-dot glossary"></span> Glossary</span>
+        <span class="legend-item"><span class="legend-dot concept"></span> Concept</span>
+        <span class="legend-item"><span class="legend-dot edge"></span> Connection</span>
+        <span class="legend-item" style="margin-left:auto;color:#4a5a4a;font-size:11px;">
+            Click node → details · Drag to pan · Scroll to zoom
+        </span>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-panel">
+        <div class="stat-card"><div class="num" id="statDocs">0</div><div class="lbl">Documents</div></div>
+        <div class="stat-card"><div class="num" id="statNodes">0</div><div class="lbl">Graph Nodes</div></div>
+        <div class="stat-card"><div class="num" id="statEdges">0</div><div class="lbl">Connections</div></div>
+        <div class="stat-card"><div class="num" id="statTypes">0</div><div class="lbl">File Types</div></div>
+        <div class="stat-card"><div class="num" id="statFolders">0</div><div class="lbl">Folders</div></div>
+    </div>
+
+    <!-- FILE LIST -->
+    <div class="file-list" id="fileList"></div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div><span style="color:#2a8b5a;">●</span> GreenSeek AI Marketing OS · Built by Viva Lancsweert</div>
+        <div>
+            <a href="mailto:vivalancsweert@gmail.com">vivalancsweert@gmail.com</a>
+            <span style="margin:0 12px;color:#2a3a2a;">|</span>
+            <span>Live from your files</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let allFiles = [];
+let graphData = { nodes: [], edges: [] };
+let showLabels = true;
+let nodePositions = {};
+
+// ============================================================
+// FILE HANDLING
+// ============================================================
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const files = e.target.files;
+    allFiles = Array.from(files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.markdown'));
+    document.getElementById('fileCount').textContent = allFiles.length;
+    document.getElementById('fileListInfo').textContent = allFiles.length + ' files selected';
+
+    // Show file list
+    const fileList = document.getElementById('fileList');
+    fileList.innerHTML = '';
+    const folders = new Set();
+    allFiles.forEach(f => {
+        const path = f.webkitRelativePath || f.name;
+        const folder = path.split('/').slice(0, -1).join('/') || 'root';
+        folders.add(folder);
+        const tag = document.createElement('span');
+        tag.className = 'file-tag';
+        const type = folder.split('/').pop() || 'root';
+        tag.innerHTML = `<span class="type-label">${type}</span>/${f.name}`;
+        fileList.appendChild(tag);
+    });
+
+    document.getElementById('statusText').textContent = allFiles.length + ' files ready — click Build Graph';
+    document.getElementById('statusDot').className = 'dot pulse';
+});
+
+// ============================================================
+// PROCESS FILES → BUILD GRAPH
+// ============================================================
+async function processFiles() {
+    if (allFiles.length === 0) {
+        alert('Please select your markdown files first.');
+        return;
+    }
+
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.add('active');
+
+    // Small delay to show loading
+    await new Promise(r => setTimeout(r, 100));
+
+    document.getElementById('statusText').textContent = 'Processing ' + allFiles.length + ' files...';
+    document.getElementById('statusDot').className = 'dot pulse';
+
+    const contents = [];
+    for (const file of allFiles) {
+        const text = await file.text();
+        const path = file.webkitRelativePath || file.name;
+        contents.push({
+            name: file.name,
+            path: path,
+            content: text,
+            folder: path.split('/').slice(0, -1).join('/') || 'root'
+        });
+    }
+
+    buildGraph(contents);
+    overlay.classList.remove('active');
+}
+
+// ============================================================
+// BUILD KNOWLEDGE GRAPH
+// ============================================================
+function buildGraph(files) {
+    const nodes = [];
+    const edges = [];
+    const nodeMap = {};
+    const folderSet = new Set();
+
+    // Helper: detect type from path
+    function getType(path) {
+        const p = path.toLowerCase();
+        if (p.includes('/product/') || p.includes('product')) return 'product';
+        if (p.includes('/brand/') || p.includes('brand')) return 'brand';
+        if (p.includes('/faq/') || p.includes('faq')) return 'faq';
+        if (p.includes('/glossary/') || p.includes('glossary')) return 'glossary';
+        return 'concept';
+    }
+
+    // Helper: extract title from markdown
+    function getTitle(content, filename) {
+        const match = content.match(/^#\s+(.+)$/m);
+        if (match) return match[1].trim();
+        const match2 = content.match(/^##\s+(.+)$/m);
+        if (match2) return match2[1].trim();
+        return filename.replace(/\.md$/, '').replace(/-/g, ' ');
+    }
+
+    // Helper: extract summary
+    function getSummary(content) {
+        const lines = content.split('\n');
+        for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed && !trimmed.startsWith('#') && !trimmed.startsWith('---') && !trimmed.startsWith('|') && !trimmed.startsWith('>')) {
+                return trimmed.slice(0, 160);
+            }
+        }
+        return 'No summary available';
+    }
+
+    // Helper: extract keywords (improved)
+    function getKeywords(content) {
+        const words = content.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+        const stopWords = new Set([
+            'the','and','for','with','this','that','from','have','are','was','were','can','all','not','but',
+            'his','her','our','your','you','we','they','them','their','has','been','will','would','could',
+            'should','may','might','must','about','after','before','during','without','through','between',
+            'among','within','upon','because','since','until','while','against','into','onto','upon'
+        ]);
+        const freq = {};
+        for (const w of words) {
+            if (w.length > 2 && !stopWords.has(w)) {
+                freq[w] = (freq[w] || 0) + 1;
+            }
+        }
+        const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]);
+        return sorted.slice(0, 6).map(([w]) => w);
+    }
+
+    // Create nodes from files
+    for (const file of files) {
+        const id = file.name.replace(/\.md$/, '');
+        const type = getType(file.path);
+        const title = getTitle(file.content, file.name);
+        const summary = getSummary(file.content);
+        const keywords = getKeywords(file.content);
+
+        nodes.push({
+            id: id,
+            label: title,
+            type: type,
+            summary: summary,
+            path: file.path,
+            keywords: keywords,
+            folder: file.folder,
+            name: file.name
+        });
+        nodeMap[id] = true;
+        folderSet.add(file.folder);
+    }
+
+    // Create edges based on multiple factors
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i];
+            const b = nodes[j];
+            let weight = 0;
+            const reasons = [];
+
+            // Shared keywords (strongest signal)
+            const shared = a.keywords.filter(k => b.keywords.includes(k));
+            if (shared.length > 0) {
+                weight += shared.length * 3;
+                reasons.push('shared keywords: ' + shared.slice(0, 3).join(', '));
+            }
+
+            // Same folder
+            if (a.folder === b.folder && a.folder !== 'root') {
+                weight += 4;
+                reasons.push('same folder');
+            }
+
+            // Title word overlap
+            const aWords = a.label.toLowerCase().split(' ');
+            const bWords = b.label.toLowerCase().split(' ');
+            const overlap = aWords.filter(w => bWords.includes(w) && w.length > 3);
+            if (overlap.length > 0) {
+                weight += overlap.length * 2;
+                reasons.push('title overlap: ' + overlap.join(', '));
+            }
+
+            // Path similarity (folder structure)
+            const aPath = a.path.split('/');
+            const bPath = b.path.split('/');
+            const commonPath = aPath.filter((p, i) => bPath[i] === p && p !== a.name);
+            if (commonPath.length > 0 && commonPath.some(p => p.length > 0)) {
+                weight += commonPath.length;
+            }
+
+            if (weight >= 3) {
+                edges.push({
+                    source: a.id,
+                    target: b.id,
+                    weight: Math.min(weight, 8),
+                    shared: reasons.slice(0, 3)
+                });
+            }
+        }
+    }
+
+    graphData = { nodes, edges };
+    renderGraph();
+    updateStats();
+
+    document.getElementById('statusText').textContent = '✅ Graph built — ' + nodes.length + ' nodes, ' + edges.length + ' connections';
+    document.getElementById('statusDot').className = 'dot';
+}
+
+// ============================================================
+// RENDER GRAPH
+// ============================================================
+function renderGraph() {
+    const svg = document.getElementById('graphSvg');
+    const nodes = graphData.nodes;
+    const edges = graphData.edges;
+
+    if (nodes.length === 0) {
+        svg.innerHTML = `
+            <text x="550" y="310" text-anchor="middle" fill="#4a5a4a" font-size="20" font-weight="300">
+                Upload your markdown files to build the knowledge graph
+            </text>
+            <text x="550" y="335" text-anchor="middle" fill="#3a4a3a" font-size="13">
+                Files are processed locally — nothing is sent anywhere
+            </text>
+        `;
+        return;
+    }
+
+    const width = 1100;
+    const height = 640;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Position nodes using force-directed layout
+    const positions = {};
+    const count = nodes.length;
+    const radius = Math.min(380, 180 + count * 1.8);
+
+    // Group by type for better organization
+    const typeGroups = {
+        product: [],
+        brand: [],
+        faq: [],
+        glossary: [],
+        concept: []
+    };
+
+    nodes.forEach(n => {
+        if (typeGroups[n.type]) typeGroups[n.type].push(n);
+        else typeGroups.concept.push(n);
+    });
+
+    // Position by type groups
+    const types = Object.keys(typeGroups).filter(k => typeGroups[k].length > 0);
+    const angleStep = (Math.PI * 2) / types.length;
+
+    types.forEach((type, typeIndex) => {
+        const group = typeGroups[type];
+        const baseAngle = -Math.PI / 2 + typeIndex * angleStep;
+        const groupRadius = radius * (0.7 + (typeIndex % 3) * 0.1);
+
+        group.forEach((node, i) => {
+            const angle = baseAngle + (i / group.length) * angleStep * 0.6 - angleStep * 0.3;
+            const r = groupRadius + (Math.random() - 0.5) * 60;
+            positions[node.id] = {
+                x: centerX + Math.cos(angle) * r,
+                y: centerY + Math.sin(angle) * r * 0.8
+            };
+        });
+    });
+
+    nodePositions = positions;
+
+    // Color map
+    const colorMap = {
+        'product': '#2a6b4a',
+        'brand': '#6a8b5a',
+        'faq': '#4a7a6a',
+        'glossary': '#2a8b5a',
+        'concept': '#5a8a6a'
+    };
+
+    const typeLabels = {
+        'product': 'PRD',
+        'brand': 'BRD',
+        'faq': 'FAQ',
+        'glossary': 'GLS',
+        'concept': 'CON'
+    };
+
+    let svgContent = '';
+
+    // Draw edges first (so nodes are on top)
+    const seenEdges = new Set();
+    for (const edge of edges) {
+        const key = [edge.source, edge.target].sort().join('-');
+        if (seenEdges.has(key)) continue;
+        seenEdges.add(key);
+
+        const source = positions[edge.source];
+        const target = positions[edge.target];
+        if (!source || !target) continue;
+
+        const weight = edge.weight || 1;
+        const opacity = 0.15 + (weight / 10) * 0.5;
+        const strokeWidth = 0.8 + weight * 0.4;
+
+        svgContent += `<line class="edge" x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}" 
+            stroke="#1a3a2a" stroke-width="${strokeWidth}" opacity="${opacity}" 
+            data-source="${edge.source}" data-target="${edge.target}" 
+            data-weight="${weight}" />`;
+    }
+
+    // Draw nodes
+    for (const node of nodes) {
+        const pos = positions[node.id];
+        if (!pos) continue;
+
+        const type = node.type || 'concept';
+        const color = colorMap[type] || '#5a8a6a';
+        const typeLabel = typeLabels[type] || 'CON';
+
+        // Size based on connections and keywords
+        const connections = edges.filter(e => e.source === node.id || e.target === node.id);
+        const connCount = connections.length;
+        const r = 20 + Math.min(connCount * 1.5, 12) + Math.min(node.keywords ? node.keywords.length : 0, 3);
+
+        const label = node.label || node.id;
+        const shortLabel = label.length > 22 ? label.slice(0, 20) + '…' : label;
+
+        // Glow effect for nodes with many connections
+        if (connCount > 5) {
+            svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="${r + 8}" fill="${color}" opacity="0.08" />`;
+            svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="${r + 4}" fill="${color}" opacity="0.12" />`;
+        }
+
+        svgContent += `<g class="node" data-id="${node.id}" data-label="${label}" data-desc="${node.summary || ''}" 
+            data-type="${type}" data-path="${node.path || ''}" data-keywords="${(node.keywords || []).join(', ')}">`;
+
+        // Node circle
+        svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="${r}" fill="#0d150f" stroke="${color}" stroke-width="2.5" />`;
+
+        // Type indicator (small dot inside)
+        svgContent += `<circle cx="${pos.x}" cy="${pos.y - r * 0.4}" r="4" fill="${color}" opacity="0.6" />`;
+
+        // Label
+        if (showLabels) {
+            const fontSize = r > 28 ? 9 : (r > 22 ? 8 : 7);
+            svgContent += `<text x="${pos.x}" y="${pos.y + (r > 28 ? 2 : 0)}" font-size="${fontSize}" font-weight="500" 
+                fill="#c8d8c8" text-anchor="middle" dominant-baseline="central">${shortLabel}</text>`;
+
+            // Type label small
+            if (r > 26) {
+                svgContent += `<text x="${pos.x}" y="${pos.y + r + 12}" font-size="7" fill="#4a5a4a" text-anchor="middle" 
+                    dominant-baseline="central" font-weight="600">${typeLabel}</text>`;
+            }
+        }
+
+        // Connection count badge
+        if (connCount > 3) {
+            svgContent += `<text x="${pos.x + r + 2}" y="${pos.y - r + 2}" font-size="8" fill="#2a8b5a" 
+                text-anchor="middle" dominant-baseline="central" font-weight="700">${connCount}</text>`;
+        }
+
+        svgContent += `</g>`;
+    }
+
+    svg.innerHTML = svgContent;
+    attachGraphEvents();
+}
+
+// ============================================================
+// GRAPH EVENTS
+// ============================================================
+function attachGraphEvents() {
+    const wrapper = document.getElementById('graphWrapper');
+    const tooltip = document.getElementById('tooltip');
+    const tipLabel = document.getElementById('tipLabel');
+    const tipType = document.getElementById('tipType');
+    const tipDesc = document.getElementById('tipDesc');
+    const tipRel = document.getElementById('tipRel');
+    const tipPath = document.getElementById('tipPath');
+
+    const nodes = document.querySelectorAll('.node');
+    const edges = document.querySelectorAll('.edge');
+
+    nodes.forEach(node => {
+        node.addEventListener('mouseenter', function(e) {
+            const label = this.dataset.label || 'Node';
+            const desc = this.dataset.desc || 'No description';
+            const type = this.dataset.type || 'concept';
+            const path = this.dataset.path || '';
+            const keywords = this.dataset.keywords || '';
+
+            tipLabel.textContent = label;
+            tipType.textContent = type.toUpperCase();
+            tipType.className = 'type-badge ' + type;
+            tipDesc.textContent = desc || keywords;
+
+            // Find connections
+            const connected = [];
+            const nodeId = this.dataset.id;
+            edges.forEach(edge => {
+                if (edge.dataset.source === nodeId) {
+                    const target = document.querySelector(`.node[data-id="${edge.dataset.target}"]`);
+                    if (target) connected.push(target.dataset.label);
+                }
+                if (edge.dataset.target === nodeId) {
+                    const source = document.querySelector(`.node[data-id="${edge.dataset.source}"]`);
+                    if (source) connected.push(source.dataset.label);
+                }
+            });
+
+            if (connected.length > 0) {
+                const display = connected.slice(0, 6);
+                tipRel.textContent = 'Connected to: ' + display.join(' · ') + (connected.length > 6 ? ' (+' + (connected.length - 6) + ' more)' : '');
+            } else {
+                tipRel.textContent = 'No direct connections';
+            }
+
+            tipPath.textContent = path;
+
+            tooltip.classList.add('visible');
+
+            // Position tooltip
+            const rect = this.querySelector('circle').getBoundingClientRect();
+            const wrapperRect = wrapper.getBoundingClientRect();
+            let left = rect.left - wrapperRect.left + rect.width / 2 - 110;
+            let top = rect.top - wrapperRect.top - 70;
+            if (left < 10) left = 10;
+            if (left > wrapperRect.width - 240) left = wrapperRect.width - 240;
+            if (top < 10) top = 10;
+            if (top > wrapperRect.height - 90) top = wrapperRect.height - 90;
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+
+            // Highlight edges
+            edges.forEach(edge => {
+                if (edge.dataset.source === nodeId || edge.dataset.target === nodeId) {
+                    edge.style.opacity = '0.9';
+                    edge.style.stroke = '#2a8b5a';
+                }
+            });
+        });
+
+        node.addEventListener('mouseleave', function() {
+            tooltip.classList.remove('visible');
+            edges.forEach(edge => {
+                edge.style.opacity = '';
+                edge.style.stroke = '#1a3a2a';
+            });
+        });
+
+        node.addEventListener('click', function() {
+            const label = this.dataset.label || 'Node';
+            const desc = this.dataset.desc || 'No description';
+            const path = this.dataset.path || '';
+            const type = this.dataset.type || 'concept';
+            const keywords = this.dataset.keywords || '';
+
+            alert(
+                '📄 ' + label + '\n' +
+                '───\n' +
+                'Type: ' + type.toUpperCase() + '\n' +
+                'Summary: ' + desc + '\n' +
+                'Keywords: ' + (keywords || 'none') + '\n' +
+                '───\n' +
+                '📁 ' + path
+            );
+        });
+    });
+
+    // Edge hover
+    edges.forEach(edge => {
+        edge.addEventListener('mouseenter', function() {
+            const source = document.querySelector(`.node[data-id="${this.dataset.source}"]`);
+            const target = document.querySelector(`.node[data-id="${this.dataset.target}"]`);
+            if (source) source.querySelector('circle').style.stroke = '#2a8b5a';
+            if (target) target.querySelector('circle').style.stroke = '#2a8b5a';
+            this.style.opacity = '0.9';
+            this.style.stroke = '#2a8b5a';
+            this.style.strokeWidth = '3';
+        });
+        edge.addEventListener('mouseleave', function() {
+            const source = document.querySelector(`.node[data-id="${this.dataset.source}"]`);
+            const target = document.querySelector(`.node[data-id="${this.dataset.target}"]`);
+            if (source) source.querySelector('circle').style.stroke = '';
+            if (target) target.querySelector('circle').style.stroke = '';
+            this.style.opacity = '';
+            this.style.stroke = '#1a3a2a';
+            this.style.strokeWidth = '';
+        });
+    });
+}
+
+// ============================================================
+// GRAPH CONTROLS (Pan, Zoom, Layout)
+// ============================================================
+let translateX = 0, translateY = 0, scale = 1;
+let isDragging = false, startX, startY;
+
+const wrapper = document.getElementById('graphWrapper');
+const svg = document.getElementById('graphSvg');
+
+wrapper.addEventListener('mousedown', function(e) {
+    if (e.target.closest('svg') || e.target.tagName === 'svg') {
+        isDragging = true;
+        startX = e.clientX - translateX;
+        startY = e.clientY - translateY;
+        wrapper.style.cursor = 'grabbing';
+    }
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    translateX = e.clientX - startX;
+    translateY = e.clientY - startY;
+    applyTransform();
+});
+
+document.addEventListener('mouseup', function() {
+    isDragging = false;
+    wrapper.style.cursor = 'grab';
+});
+
+wrapper.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    scale = Math.min(2.5, Math.max(0.4, scale + (e.deltaY > 0 ? -0.08 : 0.08)));
+    applyTransform();
+}, { passive: false });
+
+function applyTransform() {
+    svg.style.transform = 'translate(' + translateX + 'px, ' + translateY + 'px) scale(' + scale + ')';
+    svg.style.transformOrigin = 'center center';
+}
+
+function resetGraph() {
+    translateX = 0;
+    translateY = 0;
+    scale = 1;
+    applyTransform();
+}
+
+function autoLayout() {
+    resetGraph();
+    // Re-render with new positions
+    renderGraph();
+}
+
+function toggleLabels() {
+    showLabels = !showLabels;
+    renderGraph();
+}
+
+// ============================================================
+// UPDATE STATS
+// ============================================================
+function updateStats() {
+    const nodes = graphData.nodes || [];
+    const edges = graphData.edges || [];
+    const uniqueTypes = new Set(nodes.map(n => n.type));
+    const folders = new Set(nodes.map(n => n.folder));
+
+    document.getElementById('docCount').textContent = allFiles.length;
+    document.getElementById('nodeCount').textContent = nodes.length;
+    document.getElementById('edgeCount').textContent = edges.length;
+    document.getElementById('statDocs').textContent = allFiles.length;
+    document.getElementById('statNodes').textContent = nodes.length;
+    document.getElementById('statEdges').textContent = edges.length;
+    document.getElementById('statTypes').textContent = uniqueTypes.size;
+    document.getElementById('statFolders').textContent = folders.size;
+}
+
+// ============================================================
+// CLEAR
+// ============================================================
+function clearAll() {
+    allFiles = [];
+    graphData = { nodes: [], edges: [] };
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileCount').textContent = '0';
+    document.getElementById('fileList').innerHTML = '';
+    document.getElementById('fileListInfo').textContent = 'No files loaded';
+    document.getElementById('statusText').textContent = 'Ready — upload your files';
+    document.getElementById('statusDot').className = 'dot';
+    document.getElementById('graphSvg').innerHTML = `
+        <text x="550" y="310" text-anchor="middle" fill="#4a5a4a" font-size="20" font-weight="300">
+            Upload your markdown files to build the knowledge graph
+        </text>
+        <text x="550" y="335" text-anchor="middle" fill="#3a4a3a" font-size="13">
+            Files are processed locally — nothing is sent anywhere
+        </text>
+    `;
+    updateStats();
+    resetGraph();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+resetGraph();
+</script>
+
+</body>
+</html>
